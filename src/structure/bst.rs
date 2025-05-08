@@ -387,16 +387,16 @@ impl BstNode {
         }
     }
 
-    pub fn median(&self) {
+    pub fn median(&self) -> BstNodeLink {
         let mut arr= vec![];
         let mut node = self.minimum();
-        arr.push(node.borrow().key);
+        arr.push(node.clone());
 
         while let Some(exist) = BstNode::tree_successor(&node) {
-            arr.push(exist.clone().borrow().key);
+            arr.push(exist.clone());
             node = exist;
         }
 
-        println!("the median -> {:?}", arr[arr.clone().len()/2]);
+        arr[arr.clone().len()/2].clone()
     }
 }

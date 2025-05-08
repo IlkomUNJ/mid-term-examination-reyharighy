@@ -83,7 +83,8 @@ fn mid_term_test() {
         }
     }
 
-    rootlink.borrow().median();
+    let median = rootlink.borrow().median();
+    println!("the median -> {:?}", median);
 }
 
 #[allow(dead_code)]
