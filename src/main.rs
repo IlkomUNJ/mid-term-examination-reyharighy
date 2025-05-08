@@ -1,9 +1,9 @@
 mod structure;
 mod tool;
 
-use crate::structure::bst::BstNode;
 use crate::structure::tree::Node;
 use crate::structure::tree::NodeLink;
+use crate::structure::bst::BstNode;
 use crate::structure::bst::BstNodeLink;
 use crate::tool::generate_dotfile;
 use crate::tool::generate_dotfile_bst;
@@ -11,9 +11,83 @@ use crate::tool::generate_dotfile_bst;
 fn main() {
     //turn on to test the old code
     // test_binary_tree();
-    test_binary_search_tree();
+    mid_term_test();
 }
 
+fn mid_term_test() {
+    let rootlink: BstNodeLink = BstNode::new_bst_nodelink(15);
+    rootlink.borrow_mut().add_left_child(&rootlink, 6);
+    rootlink.borrow_mut().add_right_child(&rootlink, 18);
+
+    //add right subtree
+    let right_subtree: &Option<BstNodeLink> = &rootlink.borrow().right;
+    if let Some(right_tree_extract) = right_subtree {
+        right_tree_extract
+            .borrow_mut()
+            .add_left_child(right_tree_extract, 17);
+        right_tree_extract
+            .borrow_mut()
+            .add_right_child(right_tree_extract, 20);
+    }
+
+    //add left subtree
+    let left_subtree: &Option<BstNodeLink> = &rootlink.borrow().left;
+    if let Some(left_tree_extract) = left_subtree {
+        left_tree_extract
+            .borrow_mut()
+            .add_left_child(left_tree_extract, 3);
+        left_tree_extract
+            .borrow_mut()
+            .add_right_child(left_tree_extract, 7);
+
+        //add left subtree terminal
+        let left_subtree_terminal = &left_tree_extract.borrow().left;
+        if let Some(terminal_left_tree_link) = left_subtree_terminal{
+            terminal_left_tree_link.borrow_mut().add_left_child(terminal_left_tree_link, 2);
+            terminal_left_tree_link.borrow_mut().add_right_child(terminal_left_tree_link, 4);
+        }
+        //add 2nd level right subtree of node 7
+        let second_right_subtree = &left_tree_extract.borrow().right;
+        if let Some(second_right_subtree_link) = second_right_subtree{
+            second_right_subtree_link.borrow_mut().add_right_child(second_right_subtree_link, 13);
+
+            let third_left_subtree = &second_right_subtree_link.borrow().right;
+            if let Some(third_left_subtree_link) = third_left_subtree{
+                third_left_subtree_link.borrow_mut().add_left_child(third_left_subtree_link, 9);
+            }
+        }
+    }
+
+    //print the tree at this time
+    let main_tree_path = "mid_term.dot";
+    generate_dotfile_bst(&rootlink, main_tree_path);
+
+    println!("existent use case");
+    let exist_target_node = BstNode::new_bst_nodelink(9);
+    rootlink.borrow().add_node(&exist_target_node, &99);
+
+    println!("\nnon-existent use case");
+    let no_exist_target_node = BstNode::new_bst_nodelink(70);
+    rootlink.borrow().add_node(&no_exist_target_node, &99);
+
+    let query_keys = vec![3, 9];
+    for &key in query_keys.iter() {
+        if let Some(result) = rootlink.clone().borrow().tree_search(&key) {
+            if let Some(predecessor) = BstNode::tree_predecessor(&result) {
+                println!("the predecessor of {key} -> {:?}", predecessor.borrow().key);
+            } else {
+                println!("predecessor does not exist");
+            }
+        } else {
+            println!("no such key, failed to get predecessor");
+        }
+    }
+
+    let median = rootlink.borrow().median();
+    println!("the median -> {:?}", median);
+}
+
+#[allow(dead_code)]
 fn test_binary_search_tree(){
     let rootlink: BstNodeLink = BstNode::new_bst_nodelink(15);
     rootlink.borrow_mut().add_left_child(&rootlink, 6);
@@ -127,6 +201,7 @@ fn test_binary_search_tree(){
     }
 }
 
+#[allow(dead_code)]
 fn test_index(){
     let words: Vec<Vec<i32>> = vec![
                                 vec![1, 2, 3, 4],
@@ -135,7 +210,7 @@ fn test_index(){
                                 vec![1, 3, 1, 1],
                                 vec![2, 1, 2, 4]
                                 ];
-    println!("{0}", words[0][0]);
+    println!("{}", words[0][0]);
 }
 
 #[allow(dead_code)]
