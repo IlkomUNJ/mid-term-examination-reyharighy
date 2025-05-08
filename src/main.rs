@@ -12,6 +12,7 @@ fn main() {
     //turn on to test the old code
     // test_binary_tree();
     test_binary_search_tree();
+    println!("");
 }
 
 fn test_binary_search_tree(){
