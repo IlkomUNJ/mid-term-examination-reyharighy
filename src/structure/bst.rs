@@ -1,4 +1,4 @@
-use std::cell::{Ref, RefCell};
+use std::cell::RefCell;
 use std::rc::{Rc, Weak};
 
 pub type BstNodeLink = Rc<RefCell<BstNode>>;
@@ -86,7 +86,8 @@ impl BstNode {
      * replace node z with its child according to key arrangement
      */
     pub fn tree_delete(node: &BstNodeLink) -> BstNodeLink{
-        let mut node_alter: BstNodeLink = BstNode::new_bst_nodelink(0);
+        // let mut node_alter: BstNodeLink = BstNode::new_bst_nodelink(0);
+        let node_alter: BstNodeLink;
         if !BstNode::is_right_child_exist(node){
             //replace node with its left child
             node_alter = BstNode::transplant(node, &node.borrow().left.clone().unwrap());
@@ -186,6 +187,7 @@ impl BstNode {
      * Find node successor according to the book
      * Should return None, if x_node is the highest key in the tree
      */
+    #[allow(dead_code)]
     pub fn tree_successor(x_node: &BstNodeLink) -> Option<BstNodeLink> {
         // directly check if the node has a right child, otherwise go to the next block
         if let Some(right_node) = &x_node.borrow().right {
@@ -351,5 +353,50 @@ impl BstNode {
             None => None,
             Some(x) => Some(x.upgrade().unwrap()),
         }
+    }
+
+    pub fn add_node(&self, target_node: &BstNodeLink, value: &i32) -> bool {
+        if let Some(_) = self.tree_search(&target_node.borrow().key.unwrap()) {
+            println!("target node exists");
+            println!("we'll add a new node with value {value}");
+            true
+        } else {
+            println!("target node does not exist");
+            false
+        }
+    }
+
+    pub fn tree_predecessor(node: &BstNodeLink) -> Option<BstNodeLink> {
+        let query = node.clone();
+
+        if let Some(left_node) = node.borrow().left.clone() {
+            return Some(left_node);
+        } else {
+            let root = BstNode::get_root(node);
+            let mut node = root.borrow().minimum();
+
+            while let Some(successor) = BstNode::tree_successor(&node) {
+                if BstNode::is_node_match(&query, &successor) {
+                    return Some(node);
+                }
+
+                node = successor;
+            }
+
+            None
+        }
+    }
+
+    pub fn median(&self) {
+        let mut arr= vec![];
+        let mut node = self.minimum();
+        arr.push(node.borrow().key);
+
+        while let Some(exist) = BstNode::tree_successor(&node) {
+            arr.push(exist.clone().borrow().key);
+            node = exist;
+        }
+
+        println!("the median -> {:?}", arr[arr.clone().len()/2]);
     }
 }
